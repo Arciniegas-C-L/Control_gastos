@@ -1,0 +1,61 @@
+:root {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #0f172a;
+  background-color: #f5f5f6;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --muted-strong: #374151;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --border: #e5e7eb;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --primary-green: #10b981;
+  --primary-dark: #0a2e3b;
+  --accent-gold: #a3e635;
+  --income-green: #10b981;
+  --expense-red: #ef4444;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-soft: 0 10px 30px rgba(16, 185, 129, 0.08);
+  --shadow-strong: 0 20px 50px rgba(0,0,0,0.35);
+  --transition: all 0.3s ease;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #e8f5f1 0%, #f0f5f0 50%, #f5f0e8 100%);
+  color: var(--text);
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+h1, h2, h3, h4, h5 {
+  margin: 4px 0 8px 0;
+}
+
+/* Utilidades leves */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}

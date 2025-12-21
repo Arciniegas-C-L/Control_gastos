@@ -1430,10 +1430,14 @@ input:disabled, select:disabled, textarea:disabled {
 .dashboard-header {
   padding: 32px 32px 12px;
   border-bottom: 2px solid var(--border);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(248, 250, 252, 0.3));
+  /* Efecto glass sobre el contenido */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), rgba(248, 250, 252, 0.25));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 999;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
 
 .dashboard-header > div {

@@ -3,9 +3,33 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+class Role(models.Model):
+	"""Sistema de roles para el control de gastos"""
+	ROLE_CHOICES = [
+		('admin', 'Administrador'),
+		('user', 'Usuario Regular'),
+	]
+
+	name = models.CharField(max_length=20, choices=ROLE_CHOICES, unique=True)
+	description = models.TextField()
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		ordering = ['name']
+
+	def __str__(self):
+		return self.get_name_display()
+
+
 class User(AbstractUser):
 	preferred_currency = models.CharField(max_length=10, default="USD")
 	registered_at = models.DateTimeField(auto_now_add=True)
+	# Rol asignado; puede ser null al crear migraciones, se asegura en señales
+	role = models.ForeignKey(Role, on_delete=models.PROTECT, related_name="users", null=True, blank=True)
+
+	@property
+	def is_admin(self):
+		return self.role.name == 'admin'
 
 	def __str__(self):
 		return self.username

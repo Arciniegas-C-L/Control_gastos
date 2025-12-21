@@ -3,6 +3,9 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
+	AdminDashboardView,
+	AdminUserDetailView,
+	AdminUsersView,
 	BudgetViewSet,
 	CategoryViewSet,
 	MovementViewSet,
@@ -11,12 +14,14 @@ from .views import (
 	ProfileView,
 	RegisterView,
 	ReportsSummaryView,
+	RoleViewSet,
 )
 
 router = routers.DefaultRouter()
 router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'movements', MovementViewSet, basename='movement')
 router.register(r'budgets', BudgetViewSet, basename='budget')
+router.register(r'roles', RoleViewSet, basename='role')
 
 urlpatterns = [
 	path('auth/register/', RegisterView.as_view(), name='auth-register'),
@@ -26,4 +31,7 @@ urlpatterns = [
 	path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 	path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('reports/summary/', ReportsSummaryView.as_view(), name='reports-summary'),
+	path('admin/dashboard/', AdminDashboardView.as_view(), name='admin-dashboard'),
+	path('admin/users/', AdminUsersView.as_view(), name='admin-users'),
+	path('admin/users/<int:user_id>/', AdminUserDetailView.as_view(), name='admin-user-detail'),
 ] + router.urls

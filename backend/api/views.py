@@ -7,15 +7,18 @@ from django.db.models import Exists, OuterRef, Q, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Budget, Category, Movement, PasswordResetCode
+from .models import Budget, Category, Movement, PasswordResetCode, Role
+from .permissions import IsAdmin
 from .serializers import (
 	BudgetSerializer,
 	CategorySerializer,
 	MovementSerializer,
 	RegisterSerializer,
+	RoleSerializer,
 	UserSerializer,
 )
 
@@ -172,3 +175,138 @@ class ReportsSummaryView(APIView):
 				'monthly': monthly,
 			}
 		)
+
+
+class RoleViewSet(viewsets.ReadOnlyModelViewSet):
+	"""ViewSet para gestionar roles. Solo lectura para usuarios autenticados."""
+	queryset = Role.objects.all()
+	serializer_class = RoleSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
+
+class AdminUsersView(APIView):
+	"""Vista para que administradores vean todos los usuarios del sistema."""
+	permission_classes = [IsAdmin]
+
+	def get(self, request):
+		"""Obtiene lista de todos los usuarios con resumen de datos."""
+		users = User.objects.prefetch_related('role', 'movements', 'categories').all()
+		
+		users_data = []
+		for user in users:
+			movements = user.movements.all()
+			income = movements.filter(type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
+			expense = movements.filter(type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
+			
+			users_data.append({
+				'id': user.id,
+				'username': user.username,
+				'email': user.email,
+				'first_name': user.first_name,
+				'last_name': user.last_name,
+				'role': user.role.get_name_display(),
+				'registered_at': user.registered_at,
+				'total_movements': movements.count(),
+				'total_income': float(income),
+				'total_expense': float(expense),
+				'balance': float(income - expense),
+			})
+		
+		return Response(users_data)
+
+
+class AdminUserDetailView(APIView):
+	"""Vista para ver detalles completos de un usuario específico (solo admin)."""
+	permission_classes = [IsAdmin]
+
+	def get(self, request, user_id):
+		"""Obtiene detalles completos de un usuario."""
+		try:
+			user = User.objects.get(id=user_id)
+		except User.DoesNotExist:
+			return Response(
+				{'detail': 'Usuario no encontrado.'},
+				status=status.HTTP_404_NOT_FOUND
+			)
+
+		movements = user.movements.all()
+		income = movements.filter(type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
+		expense = movements.filter(type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
+
+		category_breakdown = list(
+			movements.filter(type='EXPENSE')
+			.values('category__name', 'category__color')
+			.annotate(total=Sum('amount'))
+			.order_by('-total')
+		)
+
+		monthly = list(
+			movements.annotate(month=TruncMonth('date'))
+			.values('month', 'type')
+			.annotate(total=Sum('amount'))
+			.order_by('month')
+		)
+
+		user_detail = {
+			'id': user.id,
+			'username': user.username,
+			'email': user.email,
+			'first_name': user.first_name,
+			'last_name': user.last_name,
+			'preferred_currency': user.preferred_currency,
+			'role': user.role.get_name_display(),
+			'registered_at': user.registered_at,
+			'statistics': {
+				'total_movements': movements.count(),
+				'total_income': float(income),
+				'total_expense': float(expense),
+				'balance': float(income - expense),
+				'total_categories': user.categories.count(),
+				'total_budgets': user.budgets.count(),
+			},
+			'category_breakdown': category_breakdown,
+			'monthly': monthly,
+		}
+
+		return Response(user_detail)
+
+
+class AdminDashboardView(APIView):
+	"""Vista para el dashboard administrativo con estadísticas generales."""
+	permission_classes = [IsAdmin]
+
+	def get(self, request):
+		"""Obtiene estadísticas generales del sistema."""
+		total_users = User.objects.count()
+		admin_users = User.objects.filter(role__name='admin').count()
+		regular_users = User.objects.filter(role__name='user').count()
+
+		all_movements = Movement.objects.all()
+		total_income = all_movements.filter(type='INCOME').aggregate(Sum('amount'))['amount__sum'] or 0
+		total_expense = all_movements.filter(type='EXPENSE').aggregate(Sum('amount'))['amount__sum'] or 0
+
+		top_users_by_activity = list(
+			User.objects.annotate(movement_count=Sum(1))
+			.values('id', 'username', 'email')
+			.order_by('-movement_count')[:10]
+		)
+
+		top_categories = list(
+			all_movements.filter(type='EXPENSE')
+			.values('category__name', 'category__color')
+			.annotate(total=Sum('amount'))
+			.order_by('-total')[:10]
+		)
+
+		return Response({
+			'total_users': total_users,
+			'admin_users': admin_users,
+			'regular_users': regular_users,
+			'total_movements': all_movements.count(),
+			'total_income': float(total_income),
+			'total_expense': float(total_expense),
+			'total_balance': float(total_income - total_expense),
+			'top_users': top_users_by_activity,
+			'top_categories': top_categories,
+		})
+

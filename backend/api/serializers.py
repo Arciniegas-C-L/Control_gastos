@@ -2,17 +2,27 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import Budget, Category, Movement
+from .models import Budget, Category, Movement, Role
 
 
 User = get_user_model()
 
 
+class RoleSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Role
+		fields = ['id', 'name', 'description', 'created_at']
+		read_only_fields = ['id', 'created_at']
+
+
 class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'preferred_currency', 'registered_at']
-        read_only_fields = ['id', 'registered_at']
+	role_name = serializers.CharField(source='role.get_name_display', read_only=True)
+	is_admin = serializers.BooleanField(read_only=True)
+
+	class Meta:
+		model = User
+		fields = ['id', 'username', 'email', 'first_name', 'last_name', 'preferred_currency', 'registered_at', 'role', 'role_name', 'is_admin']
+		read_only_fields = ['id', 'registered_at', 'role', 'is_admin']
 
 
 class RegisterSerializer(serializers.ModelSerializer):

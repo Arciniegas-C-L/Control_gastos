@@ -1,15 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import Budget, Category, Movement, PasswordResetCode, User
+from .models import Budget, Category, Movement, PasswordResetCode, Role, User
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
 	fieldsets = BaseUserAdmin.fieldsets + (
-		('Extra', {'fields': ('preferred_currency',)}),
+		('Extra', {'fields': ('preferred_currency', 'role')}),
 	)
-	list_display = ('username', 'email', 'preferred_currency', 'is_staff', 'is_superuser')
+	list_display = ('username', 'email', 'role', 'preferred_currency', 'is_staff', 'is_superuser')
+	list_filter = BaseUserAdmin.list_filter + ('role',)
 
 
 @admin.register(Category)
@@ -35,3 +36,9 @@ class BudgetAdmin(admin.ModelAdmin):
 @admin.register(PasswordResetCode)
 class PasswordResetCodeAdmin(admin.ModelAdmin):
 	list_display = ('user', 'code', 'created_at', 'is_used')
+
+
+@admin.register(Role)
+class RoleAdmin(admin.ModelAdmin):
+	list_display = ('name', 'description', 'created_at')
+	search_fields = ('name',)

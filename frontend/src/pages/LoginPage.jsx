@@ -30,11 +30,11 @@ const LoginPage = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
-        <p className="eyebrow">Control de gastos</p>
-        <h1>Inicia sesión</h1>
+      <div className="auth-card auth-card--login">
+        <h1>Inicia sesion</h1>
         {error && <div className="alert">{error}</div>}
-        <form className="form" onSubmit={handleSubmit}>
+
+        <form className="form auth-form" onSubmit={handleSubmit}>
           <label>
             Usuario
             <input
@@ -42,6 +42,8 @@ const LoginPage = () => {
               value={form.username}
               onChange={handleChange}
               autoFocus
+              placeholder="Tu usuario"
+              autoComplete="username"
               required
             />
           </label>
@@ -52,13 +54,16 @@ const LoginPage = () => {
               type="password"
               value={form.password}
               onChange={handleChange}
+              placeholder="Ingresa tu contraseña"
+              autoComplete="current-password"
               required
             />
           </label>
-          <button className="primary" type="submit" disabled={loading}>
+          <button className="primary auth-submit" type="submit" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
         <p className="muted">
           ¿No tienes cuenta? <Link to="/register">Crea una</Link>
         </p>

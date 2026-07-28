@@ -36,19 +36,21 @@ const RegisterPage = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card auth-card--register">
         <p className="eyebrow">Control de gastos</p>
         <h1>Crea tu cuenta</h1>
         {error && <div className="alert">{error}</div>}
-        <form className="form" onSubmit={handleSubmit}>
-          <label>
-            Usuario
-            <input name="username" value={form.username} onChange={handleChange} required />
-          </label>
-          <label>
-            Correo
-            <input name="email" type="email" value={form.email} onChange={handleChange} />
-          </label>
+        <form className="form auth-form auth-form--register" onSubmit={handleSubmit}>
+          <div className="form-grid">
+            <label>
+              Usuario
+              <input name="username" value={form.username} onChange={handleChange} required />
+            </label>
+            <label>
+              Correo
+              <input name="email" type="email" value={form.email} onChange={handleChange} />
+            </label>
+          </div>
           <div className="form-grid">
             <label>
               Nombre

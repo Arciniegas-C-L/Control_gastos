@@ -12,21 +12,23 @@ const CategoryForm = ({ onSubmit, loading }) => {
   }
 
   return (
-    <form className="panel" onSubmit={handleSubmit}>
+    <form className="panel category-form" onSubmit={handleSubmit}>
       <div className="panel-header">Nueva categoría</div>
-      <div className="form-grid">
+      <div className="category-fields">
         <label>
           Nombre
           <input value={name} onChange={(e) => setName(e.target.value)} required />
         </label>
-        <label>
+        <label className="category-color">
           Color
           <input type="color" value={color} onChange={(e) => setColor(e.target.value)} />
         </label>
       </div>
-      <button className="secondary" type="submit" disabled={loading}>
-        {loading ? 'Creando...' : 'Crear categoría'}
-      </button>
+      <div className="category-actions">
+        <button className="secondary" type="submit" disabled={loading}>
+          {loading ? 'Creando...' : 'Crear categoría'}
+        </button>
+      </div>
     </form>
   )
 }
@@ -35,7 +37,7 @@ const CategoriesSection = ({ onSubmit, loading }) => {
   return (
     <div className="section">
       <h2>Categorías</h2>
-      <div className="grid-2">
+      <div className="categories-layout">
         <CategoryForm onSubmit={onSubmit} loading={loading} />
       </div>
     </div>

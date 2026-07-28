@@ -27,9 +27,9 @@ const MovementForm = ({ categories, onSubmit, loading }) => {
   }
 
   return (
-    <form className="panel" onSubmit={handleSubmit}>
+    <form className="panel movement-form" onSubmit={handleSubmit}>
       <div className="panel-header">Nuevo movimiento</div>
-      <div className="form-grid">
+      <div className="movement-fields">
         <label>
           Monto
           <input
@@ -64,12 +64,12 @@ const MovementForm = ({ categories, onSubmit, loading }) => {
             ))}
           </select>
         </label>
-        <label>
+        <label className="movement-date">
           Fecha
           <input name="date" type="date" value={form.date} onChange={handleChange} />
         </label>
       </div>
-      <label>
+      <label className="movement-description">
         Descripción
         <textarea
           name="description"
@@ -79,9 +79,11 @@ const MovementForm = ({ categories, onSubmit, loading }) => {
           placeholder="Opcional"
         />
       </label>
-      <button className="primary" type="submit" disabled={loading}>
-        {loading ? 'Guardando...' : 'Guardar movimiento'}
-      </button>
+      <div className="movement-actions">
+        <button className="primary" type="submit" disabled={loading}>
+          {loading ? 'Guardando...' : 'Guardar movimiento'}
+        </button>
+      </div>
     </form>
   )
 }
@@ -118,8 +120,10 @@ const MovementsList = ({ movements }) => (
 const MovementsSection = ({ movements, categories, onSubmit, loading }) => {
   return (
     <div className="section">
-      <h2>Movimientos</h2>
-      <div className="grid-2">
+      <div className="section-heading">
+        <h2>Movimientos</h2>
+      </div>
+      <div className="movements-layout">
         <MovementForm categories={categories} onSubmit={onSubmit} loading={loading} />
       </div>
       <MovementsList movements={movements} />
